@@ -1,0 +1,2 @@
+yarn run tsc --noEmit
+yarn run lint:fix

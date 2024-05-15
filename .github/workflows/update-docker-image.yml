@@ -1,0 +1,40 @@
+name: Update docker image
+
+on:
+  workflow_run:
+    workflows: ['Update release version']
+    types:
+      - completed
+
+jobs:
+  update-docker-image:
+    name: Update docker image
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Add the version of the image to the environment
+        run: echo "IMAGE_VERSION=$(jq -r '.version' package.json)" >> $GITHUB_ENV
+      - name: Add the name of the image to the environment
+        run: echo "IMAGE_NAME=$(basename $GITHUB_REPOSITORY)" >> $GITHUB_ENV
+      - name: Add the full name of the image to the environment
+        run: echo "IMAGE_FULL_NAME=$IMAGE_NAME:$IMAGE_VERSION" >> $GITHUB_ENV
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_FULL_NAME }}
