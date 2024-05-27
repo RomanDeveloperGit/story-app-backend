@@ -1,15 +1,17 @@
+import { VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
 
-// TODO: сделать конфиг сервис
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  console.log(process.env);
-
-  // TODO: /api - префикс, по дефолту /v1
+  app.setGlobalPrefix('api');
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: '1',
+  });
+  app.enableCors();
 
   await app.listen(8000);
 }
