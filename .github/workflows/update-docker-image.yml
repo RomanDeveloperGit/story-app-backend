@@ -1,10 +1,10 @@
 name: Update docker image
 
-on:
-  workflow_run:
-    workflows: ['Update release version']
-    types:
-      - completed
+# on:
+#   workflow_run:
+#     workflows: ['Update release version']
+#     types:
+#       - completed
 
 jobs:
   update-docker-image:
