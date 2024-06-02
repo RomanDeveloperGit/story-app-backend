@@ -1,7 +1,7 @@
-// import { ConfigService as _ConfigService } from '@nestjs/config';
+import { Injectable } from '@nestjs/common';
+import { ConfigService as _ConfigService } from '@nestjs/config';
 
-// import { Config } from './config.interface';
+import { Config } from './config.interface';
 
-// export const ConfigService = _ConfigService<Config>;
-
-// TODO: сделать нормальный сервис
+@Injectable()
+export class ConfigService extends _ConfigService<Config> {}

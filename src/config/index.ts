@@ -1,2 +1,2 @@
-export { configFactory } from './config.factory';
-export { Config } from './config.interface';
+export { ConfigModule } from './config.module';
+export { ConfigService } from './config.service';
