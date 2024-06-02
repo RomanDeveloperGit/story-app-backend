@@ -1,5 +1,7 @@
 name: Update docker image
 
+on: workflow_dispatch
+
 # on:
 #   workflow_run:
 #     workflows: ['Update release version']
