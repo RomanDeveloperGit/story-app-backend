@@ -1,4 +1,4 @@
-import { Config } from './config.interface';
+import { Config } from '@/core/config/model';
 
 type ConfigFactory = () => Partial<Config>;
 
