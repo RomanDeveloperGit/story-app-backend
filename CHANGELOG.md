@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/RomanDeveloperGit/story-app-backend/compare/v1.1.0...v1.2.0) (2024-06-24)
+
+
+### Features
+
+* **user:** add user creation ([00bc192](https://github.com/RomanDeveloperGit/story-app-backend/commit/00bc192257136e1883ae5ac422aad99d4de2f1c5))
+
 # [1.1.0](https://github.com/RomanDeveloperGit/story-app-backend/compare/v1.0.0...v1.1.0) (2024-05-27)
 
 
