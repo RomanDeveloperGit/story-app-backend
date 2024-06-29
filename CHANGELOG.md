@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/RomanDeveloperGit/story-app-backend/compare/v1.2.0...v1.3.0) (2024-06-29)
+
+
+### Features
+
+* add minimal jwt auth ([052518b](https://github.com/RomanDeveloperGit/story-app-backend/commit/052518b843c2727e6bf901a147bc50cdaa0cbff7))
+
 # [1.2.0](https://github.com/RomanDeveloperGit/story-app-backend/compare/v1.1.0...v1.2.0) (2024-06-24)
 
 
