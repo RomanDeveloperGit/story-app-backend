@@ -1,21 +1,17 @@
-import { ClassSerializerInterceptor, ValidationPipe, VersioningType } from '@nestjs/common';
-import { NestFactory, Reflector } from '@nestjs/core';
+import { VersioningType } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-import { ConfigService } from './shared/config';
+import { ConfigService } from '@/shared/config';
 
 import { AppModule } from './app.module';
+
+// TODO: to think about a new architecture style. Maybe it will be DDD, onion or etc...
+// Because even now we have a not low-coupling
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
-
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-    }),
-  );
-  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   app.setGlobalPrefix('api');
   app.enableVersioning({
@@ -25,7 +21,10 @@ async function bootstrap() {
   app.enableCors();
 
   if (configService.get('hasDocs')) {
-    const swaggerConfig = new DocumentBuilder().setTitle('Story app backend API').build();
+    const swaggerConfig = new DocumentBuilder()
+      .addBearerAuth()
+      .setTitle('Story app backend API')
+      .build();
 
     const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
     SwaggerModule.setup('docs', app, swaggerDocument);

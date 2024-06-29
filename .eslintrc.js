@@ -8,10 +8,8 @@ module.exports = configure({
       sort: {
         newline: true,
         groups: [
-          ['@nest', '@prisma', 'bcrypt'],
-          ['^@/'],
-          ['./shared/'],
-          ['./domains/'],
+          ['@nest', 'express', 'passport', 'jsonwebtoken', 'bcrypt', '@prisma'],
+          ['^@/shared/', '^@/domains/'],
           ['^\\.'],
         ],
       },

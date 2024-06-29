@@ -3,8 +3,7 @@ import { genSaltSync, hashSync } from 'bcrypt';
 
 import { PrismaService } from '@/shared/prisma';
 
-import { CreateUserDto } from './dto/createUser.dto';
-import { UserEntity } from './user.entity';
+import { CreateUserRequest, CreateUserResponse } from './dto/createUser.dto';
 
 @Injectable()
 export class UserService {
@@ -14,10 +13,10 @@ export class UserService {
     return hashSync(password, genSaltSync(10));
   }
 
-  async create(data: CreateUserDto): Promise<UserEntity> {
+  async create(data: CreateUserRequest): Promise<CreateUserResponse> {
     const password = this.hashPassword(data.password);
     const user = await this.prismaService.user.create({ data: { ...data, password } });
 
-    return new UserEntity(user);
+    return new CreateUserResponse(user);
   }
 }
