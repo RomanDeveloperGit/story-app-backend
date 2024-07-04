@@ -1,22 +1,17 @@
 import { IsEmail, IsString, MinLength } from 'class-validator';
 
-export class LogInRequest {
+import { GetUserByAuthDataRequest } from '@/domains/user/dto/get-user-by-auth-data.dto';
+
+export class LogInRequest implements GetUserByAuthDataRequest {
   @IsEmail()
   email: string;
 
   @IsString()
-  @MinLength(2)
-  firstName: string;
-
-  @IsString()
-  @MinLength(2)
-  lastName: string;
+  @MinLength(6)
+  password: string;
 }
 
 export class LogInResponse {
-  @IsString()
   accessToken: string;
-
-  @IsString()
   refreshToken: string;
 }

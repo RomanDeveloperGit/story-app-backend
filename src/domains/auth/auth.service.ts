@@ -1,30 +1,78 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { User } from '@prisma/client';
 
-import { CreateUserResponse } from '@/domains/user/dto/createUser.dto';
+import { ConfigService } from '@/shared/config';
+import { UserService } from '@/domains/user/user.service';
 
 import { LogInRequest, LogInResponse } from './dto/log-in.dto';
-import { SignUpResponse } from './dto/sign-up.dto';
+import { RefreshResponse } from './dto/refresh.dto';
+import { SignUpRequest, SignUpResponse } from './dto/sign-up.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private configService: ConfigService,
+    private userService: UserService,
+  ) {}
 
-  async logIn(data: LogInRequest): Promise<LogInResponse> {
-    const accessToken = await this.jwtService.signAsync(data);
+  private async getTokens(user: User): Promise<LogInResponse> {
+    const accessTokenPayload: AccessTokenPayload = {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+    };
+
+    const refreshTokenPayload: RefreshTokenPayload = {
+      email: user.email,
+    };
+
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(accessTokenPayload, {
+        expiresIn: this.configService.get('jwtAccessExpiresIn'),
+        secret: this.configService.get('jwtAccessSecret'),
+      }),
+      this.jwtService.signAsync(refreshTokenPayload, {
+        expiresIn: this.configService.get('jwtRefreshExpiresIn'),
+        secret: this.configService.get('jwtRefreshSecret'),
+      }),
+    ]);
 
     return {
       accessToken,
-      refreshToken: '',
+      refreshToken,
     };
   }
 
-  async signUp(data: CreateUserResponse): Promise<SignUpResponse> {
-    const token = await this.logIn(data);
+  async logIn(data: LogInRequest): Promise<LogInResponse> {
+    const user = await this.userService.getUserByAuthData(data);
 
-    return {
-      user: data,
-      auth: token,
-    };
+    if (!user) {
+      throw new BadRequestException("User doesn't exist");
+    }
+
+    const tokens = await this.getTokens(user);
+
+    return tokens;
+  }
+
+  async signUp(data: SignUpRequest): Promise<SignUpResponse> {
+    const user = await this.userService.create(data);
+    const tokens = await this.getTokens(user);
+
+    return tokens;
+  }
+
+  async refresh(data: RequestWithRefreshTokenFullPayload['user']): Promise<RefreshResponse> {
+    const user = await this.userService.getUserByEmail(data.email);
+
+    if (!user) {
+      throw new BadRequestException("User doesn't exist");
+    }
+
+    const tokens = await this.getTokens(user);
+
+    return tokens;
   }
 }

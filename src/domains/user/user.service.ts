@@ -1,22 +1,43 @@
 import { Injectable } from '@nestjs/common';
-import { genSaltSync, hashSync } from 'bcrypt';
+import { compare, hash } from 'bcrypt';
+import { User } from '@prisma/client';
 
+import { ConfigService } from '@/shared/config';
 import { PrismaService } from '@/shared/prisma';
 
-import { CreateUserRequest, CreateUserResponse } from './dto/createUser.dto';
+import { CreateUserRequest } from './dto/create-user.dto';
+import { GetUserByAuthDataRequest } from './dto/get-user-by-auth-data.dto';
 
 @Injectable()
 export class UserService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private configService: ConfigService,
+  ) {}
 
-  private hashPassword(password: string) {
-    return hashSync(password, genSaltSync(10));
-  }
-
-  async create(data: CreateUserRequest): Promise<CreateUserResponse> {
-    const password = this.hashPassword(data.password);
+  async create(data: CreateUserRequest): Promise<User> {
+    const password = await hash(data.password, this.configService.get('passwordHashSalt'));
     const user = await this.prismaService.user.create({ data: { ...data, password } });
 
-    return new CreateUserResponse(user);
+    return user;
+  }
+
+  async getUserByEmail(data: string): Promise<User | null> {
+    const user = await this.prismaService.user.findFirst({
+      where: {
+        email: data,
+      },
+    });
+
+    return user;
+  }
+
+  async getUserByAuthData(data: GetUserByAuthDataRequest): Promise<User | null> {
+    const user = await this.getUserByEmail(data.email);
+    if (!user) return null;
+
+    const isPasswordCorrect = await compare(data.password, user.password);
+
+    return isPasswordCorrect ? user : null;
   }
 }

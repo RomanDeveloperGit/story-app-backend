@@ -1,6 +1,13 @@
 export interface Config {
   databaseUrl: string;
+
   hasDocs: boolean;
-  jwtSecret: string;
-  jwtExpiresIn: string;
+
+  passwordHashSalt: number;
+
+  jwtAccessSecret: string;
+  jwtAccessExpiresIn: string;
+
+  jwtRefreshSecret: string;
+  jwtRefreshExpiresIn: string;
 }

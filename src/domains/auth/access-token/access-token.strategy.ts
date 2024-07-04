@@ -4,19 +4,21 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { ConfigService } from '@/shared/config';
 
-export const JWT_STRATEGY_NAME = 'jwt';
+import { ACCESS_TOKEN_STRATEGY_NAME } from './access-token.constants';
 
 @Injectable()
-export class JwtAuthStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {
+export class AccessTokenStrategy extends PassportStrategy(Strategy, ACCESS_TOKEN_STRATEGY_NAME) {
   constructor(configService: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get('jwtSecret'),
+      secretOrKey: configService.get('jwtAccessSecret'),
     });
   }
 
-  async validate(payload: JwtFullPayload): Promise<JwtUserPayload> {
+  async validate(payload: AccessTokenFullPayload): Promise<AccessTokenFullPayload> {
+    // TODO: check something specific, maybe...
+
     return payload;
   }
 }

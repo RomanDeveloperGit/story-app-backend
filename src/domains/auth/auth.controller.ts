@@ -1,19 +1,15 @@
 import { Body, Controller, Post, Request } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { UserService } from '@/domains/user/user.service';
-
 import { AuthService } from './auth.service';
 import { LogInRequest } from './dto/log-in.dto';
 import { SignUpRequest } from './dto/sign-up.dto';
+import { RefreshTokenGuard } from './refresh-token/refresh-token.guard';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private userService: UserService,
-    private authService: AuthService,
-  ) {}
+  constructor(private authService: AuthService) {}
 
   @Post('log-in')
   async logIn(@Body() data: LogInRequest) {
@@ -22,8 +18,12 @@ export class AuthController {
 
   @Post('sign-up')
   async signUp(@Body() data: SignUpRequest) {
-    const user = await this.userService.create(data);
+    return this.authService.signUp(data);
+  }
 
-    return this.authService.signUp(user);
+  @Post('refresh')
+  @RefreshTokenGuard()
+  async refresh(@Request() request: RequestWithRefreshTokenFullPayload) {
+    return this.authService.refresh(request.user);
   }
 }
