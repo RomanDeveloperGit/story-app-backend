@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/RomanDeveloperGit/story-app-backend/compare/v1.3.0...v1.4.0) (2024-07-04)
+
+
+### Features
+
+* add auth module ([cc5f44b](https://github.com/RomanDeveloperGit/story-app-backend/commit/cc5f44b5c82419ba55eac242ca90e1ad28cab0ef))
+
 # [1.3.0](https://github.com/RomanDeveloperGit/story-app-backend/compare/v1.2.0...v1.3.0) (2024-06-29)
 
 
