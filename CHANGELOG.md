@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/RomanDeveloperGit/story-app-backend/compare/v1.4.0...v1.5.0) (2024-07-14)
+
+
+### Features
+
+* **auth:** add error codes ([a7212f9](https://github.com/RomanDeveloperGit/story-app-backend/commit/a7212f9a7041dc5cace93065a886bcb5a81b613c))
+
 # [1.4.0](https://github.com/RomanDeveloperGit/story-app-backend/compare/v1.3.0...v1.4.0) (2024-07-04)
 
 
