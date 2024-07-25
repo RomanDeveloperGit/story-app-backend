@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/RomanDeveloperGit/story-app-backend/compare/v1.5.0...v1.6.0) (2024-07-25)
+
+
+### Features
+
+* **auth:** add access token checking and log out operations ([a6b8479](https://github.com/RomanDeveloperGit/story-app-backend/commit/a6b84790fac114bac72e0e0fc135f235c4480547))
+
 # [1.5.0](https://github.com/RomanDeveloperGit/story-app-backend/compare/v1.4.0...v1.5.0) (2024-07-14)
 
 
