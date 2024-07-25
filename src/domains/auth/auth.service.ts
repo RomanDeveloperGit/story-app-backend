@@ -1,18 +1,21 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { Response } from 'express';
+
 import { JwtService } from '@nestjs/jwt';
+
 import { User } from '@prisma/client';
 
 import { ConfigService } from '@/shared/config';
 import { UserService } from '@/domains/user/user.service';
 
-import {
-  ERROR_EMAIL_TAKEN,
-  ERROR_INVALID_REFRESH_TOKEN,
-  ERROR_USER_NOT_FOUND,
-} from './auth.error-codes';
+import { ERROR_EMAIL_TAKEN, ERROR_USER_NOT_FOUND } from './auth.errors';
+import { AuthorizedUser } from './dto/authorized-user.dto';
+import { CheckAccessTokenResponse } from './dto/check-access-token.dto';
 import { LogInRequest, LogInResponse } from './dto/log-in.dto';
 import { RefreshResponse } from './dto/refresh.dto';
 import { SignUpRequest, SignUpResponse } from './dto/sign-up.dto';
+
+const REFRESH_TOKEN_COOKIE_PATH = '/api/v1/auth/refresh';
 
 @Injectable()
 export class AuthService {
@@ -22,7 +25,10 @@ export class AuthService {
     private userService: UserService,
   ) {}
 
-  private async getTokens(user: User): Promise<LogInResponse> {
+  private async getTokens(user: User): Promise<{
+    accessToken: string;
+    refreshToken: string;
+  }> {
     const accessTokenPayload: AccessTokenPayload = {
       firstName: user.firstName,
       lastName: user.lastName,
@@ -50,8 +56,25 @@ export class AuthService {
     };
   }
 
-  async logIn(data: LogInRequest): Promise<LogInResponse> {
-    const user = await this.userService.getUserByAuthData(data);
+  private saveRefreshTokenInCookie(response: Response, refreshToken: string) {
+    const maxAge = this.configService.get('jwtRefreshExpiresIn') * 1000;
+
+    response.cookie(this.configService.get('refreshTokenCookieKey'), refreshToken, {
+      maxAge,
+      httpOnly: true,
+      path: REFRESH_TOKEN_COOKIE_PATH,
+      // sameSite: 'lax',
+    });
+  }
+
+  private clearRefreshTokenInCookie(response: Response) {
+    response.clearCookie(this.configService.get('refreshTokenCookieKey'), {
+      path: REFRESH_TOKEN_COOKIE_PATH,
+    });
+  }
+
+  async logIn(response: Response, data: LogInRequest): Promise<LogInResponse> {
+    const user = await this.userService.getUserByEmailAndPassword(data);
 
     if (!user) {
       throw new BadRequestException({
@@ -62,10 +85,15 @@ export class AuthService {
 
     const tokens = await this.getTokens(user);
 
-    return tokens;
+    this.saveRefreshTokenInCookie(response, tokens.refreshToken);
+
+    return {
+      accessToken: tokens.accessToken,
+      user: new AuthorizedUser(user),
+    };
   }
 
-  async signUp(data: SignUpRequest): Promise<SignUpResponse> {
+  async signUp(response: Response, data: SignUpRequest): Promise<SignUpResponse> {
     const isEmailTaken = Boolean(await this.userService.getUserByEmail(data.email));
 
     if (isEmailTaken) {
@@ -78,22 +106,63 @@ export class AuthService {
     const user = await this.userService.create(data);
     const tokens = await this.getTokens(user);
 
-    return tokens;
+    this.saveRefreshTokenInCookie(response, tokens.refreshToken);
+
+    return {
+      accessToken: tokens.accessToken,
+      user: new AuthorizedUser(user),
+    };
   }
 
-  async refresh(data: RequestWithRefreshTokenFullPayload['user']): Promise<RefreshResponse> {
-    const user = await this.userService.getUserByEmail(data.email);
+  async refresh(
+    response: Response,
+    refreshTokenFullPayload: RefreshTokenFullPayload,
+  ): Promise<RefreshResponse> {
+    const user = await this.userService.getUserByEmail(refreshTokenFullPayload.email);
 
     if (!user) {
       // TODO: move this to refresh strategy
       throw new BadRequestException({
-        code: ERROR_INVALID_REFRESH_TOKEN,
+        code: ERROR_USER_NOT_FOUND,
         message: "User doesn't exist with this token data",
       });
     }
 
     const tokens = await this.getTokens(user);
 
-    return tokens;
+    this.saveRefreshTokenInCookie(response, tokens.refreshToken);
+
+    return {
+      accessToken: tokens.accessToken,
+      user: new AuthorizedUser(user),
+    };
+  }
+
+  async checkAccessToken(
+    accessTokenFullPayload: AccessTokenFullPayload,
+  ): Promise<CheckAccessTokenResponse> {
+    const user = await this.userService.getUserByEmail(accessTokenFullPayload.email);
+
+    if (!user) {
+      throw new BadRequestException({
+        code: ERROR_USER_NOT_FOUND,
+        message: "User doesn't exist with this token data",
+      });
+    }
+
+    return new AuthorizedUser(user);
+  }
+
+  async logOut(response: Response, accessTokenFullPayload: AccessTokenFullPayload): Promise<void> {
+    const user = await this.userService.getUserByEmail(accessTokenFullPayload.email);
+
+    if (!user) {
+      throw new BadRequestException({
+        code: ERROR_USER_NOT_FOUND,
+        message: "User doesn't exist with this token data",
+      });
+    }
+
+    this.clearRefreshTokenInCookie(response);
   }
 }

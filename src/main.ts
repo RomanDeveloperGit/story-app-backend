@@ -6,8 +6,12 @@ import { ConfigService } from '@/shared/config';
 
 import { AppModule } from './app.module';
 
+import * as cookieParser from 'cookie-parser';
+
 // TODO: to think about a new architecture style. Maybe it will be DDD, onion or etc...
-// Because even now we have a not low-coupling
+// Because even now, we have a not low-coupling
+
+// TODO: to think about error handling
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,6 +22,8 @@ async function bootstrap() {
     type: VersioningType.URI,
     defaultVersion: '1',
   });
+
+  app.use(cookieParser());
   app.enableCors();
 
   if (configService.get('hasDocs')) {

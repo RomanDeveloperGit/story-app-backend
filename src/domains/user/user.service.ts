@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
+
 import { compare, hash } from 'bcrypt';
+
 import { User } from '@prisma/client';
 
 import { ConfigService } from '@/shared/config';
 import { PrismaService } from '@/shared/prisma';
 
 import { CreateUserRequest } from './dto/create-user.dto';
-import { GetUserByAuthDataRequest } from './dto/get-user-by-auth-data.dto';
+import { GetUserByEmailAndPasswordRequest } from './dto/get-user-by-email-and-password';
 
 @Injectable()
 export class UserService {
@@ -32,7 +34,7 @@ export class UserService {
     return user;
   }
 
-  async getUserByAuthData(data: GetUserByAuthDataRequest): Promise<User | null> {
+  async getUserByEmailAndPassword(data: GetUserByEmailAndPasswordRequest): Promise<User | null> {
     const user = await this.getUserByEmail(data.email);
     if (!user) return null;
 

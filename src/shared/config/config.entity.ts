@@ -6,8 +6,10 @@ export interface Config {
   passwordHashSalt: number;
 
   jwtAccessSecret: string;
-  jwtAccessExpiresIn: string;
+  jwtAccessExpiresIn: number; // only in seconds
 
   jwtRefreshSecret: string;
-  jwtRefreshExpiresIn: string;
+  jwtRefreshExpiresIn: number; // only in seconds
+
+  refreshTokenCookieKey: string;
 }

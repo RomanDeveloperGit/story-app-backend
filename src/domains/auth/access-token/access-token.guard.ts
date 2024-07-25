@@ -1,8 +1,9 @@
 import { applyDecorators, Injectable, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
+
 import { AuthGuard } from '@nestjs/passport';
 
-import { ACCESS_TOKEN_STRATEGY_NAME } from './access-token.constants';
+import { ACCESS_TOKEN_STRATEGY_NAME } from './access-token.strategy';
 
 @Injectable()
 class BasicAccessTokenGuard extends AuthGuard(ACCESS_TOKEN_STRATEGY_NAME) {}
