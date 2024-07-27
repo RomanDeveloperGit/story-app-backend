@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/RomanDeveloperGit/story-app-backend/compare/v1.6.0...v1.7.0) (2024-07-27)
+
+
+### Features
+
+* **user:** add role attribute ([44e494e](https://github.com/RomanDeveloperGit/story-app-backend/commit/44e494ecf97ee7e0c5163373cbec8661ccd27c13))
+
 # [1.6.0](https://github.com/RomanDeveloperGit/story-app-backend/compare/v1.5.0...v1.6.0) (2024-07-25)
 
 
