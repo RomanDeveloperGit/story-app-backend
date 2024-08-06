@@ -9,7 +9,7 @@ import { ConfigService } from '@/shared/config';
 export const REFRESH_TOKEN_STRATEGY_NAME = 'jwt-refresh-token-strategy';
 
 @Injectable()
-export class RefreshTokenStrategy extends PassportStrategy(Strategy) {
+export class RefreshTokenStrategy extends PassportStrategy(Strategy, REFRESH_TOKEN_STRATEGY_NAME) {
   constructor(configService: ConfigService) {
     super({
       secretOrKey: configService.get('jwtRefreshSecret'),
