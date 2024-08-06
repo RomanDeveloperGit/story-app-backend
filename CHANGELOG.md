@@ -1,3 +1,11 @@
+## [1.7.1](https://github.com/RomanDeveloperGit/story-app-backend/compare/v1.7.0...v1.7.1) (2024-08-06)
+
+
+### Bug Fixes
+
+* **auth/refresh:** remove user from the response ([71e574d](https://github.com/RomanDeveloperGit/story-app-backend/commit/71e574d3cb40bace9fd1042a434951ee682237b7))
+* **strategy/refresh-token:** add name for strategy ([3d7ea49](https://github.com/RomanDeveloperGit/story-app-backend/commit/3d7ea49ffe4718ef01ea05e16226ea74175c151d))
+
 # [1.7.0](https://github.com/RomanDeveloperGit/story-app-backend/compare/v1.6.0...v1.7.0) (2024-07-27)
 
 
