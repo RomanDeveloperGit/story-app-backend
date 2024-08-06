@@ -134,7 +134,6 @@ export class AuthService {
 
     return {
       accessToken: tokens.accessToken,
-      user: new AuthorizedUser(user),
     };
   }
 
